@@ -1,0 +1,214 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+</head>
+
+<body>
+
+<div ng-app="myApp" ng-controller="myCtrl">
+
+<form class="form-horizontal">
+  <div class="form-group">
+    <label for="inputEmail3" class="col-sm-2 control-label">TỶ GIÁ (USD/VND)</label>
+    <div class="col-sm-10">
+      <input type="text" class="form-control" ng-model="exchange_rate" ng-change="cal_tax()">
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="col-sm-2 control-label">LƯƠNG THÁNG (USD)</label>
+    <div class="col-sm-10">
+      <input type="text" class="form-control" ng-model="monthly_salary" ng-change="cal_tax()">
+      <span>VND: {{monthly_salary_vnd | currency:"$":0}}</span>
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="col-sm-2 control-label">LƯƠNG 13th (USD)</label>
+    <div class="col-sm-10">
+      <input type="text" class="form-control" ng-model="bonus_salary" ng-change="cal_tax()">
+      <span>VND: {{bonus_salary_vnd | currency:"$":0}}</span>
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="col-sm-2 control-label">TỔNG TIỀN THƯỞNG (VND)</label>
+    <div class="col-sm-10">
+      <input type="text" class="form-control" ng-model="bonus" ng-change="cal_tax()">
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="col-sm-2 control-label">LƯƠNG CƠ BẢN (VND)</label>
+    <div class="col-sm-10">
+      <p class="form-control-static">{{basic_salary | currency:"$":0}}</p>
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="col-sm-2 control-label">PHỤ CẤP GIẢM TRỪ</label>
+  </div>
+  <div class="form-group">
+    <label class="col-sm-2 control-label">SỐ NGƯỜI PHỤ THUỘC (GTGC)</label>
+    <div class="col-sm-10">
+      <input type="text" class="form-control" ng-model="dependent" ng-change="cal_tax()">
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="col-sm-2 control-label">PHỤ CẤP ĂN UỐNG (VND)</label>
+    <div class="col-sm-10">
+      <p class="form-control-static">{{eating | currency:"$":0}}</p>
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="col-sm-2 control-label">PHỤ CẤP ĐIỆN THOẠI (VND)</label>
+    <div class="col-sm-10">
+      <p class="form-control-static">{{phone | currency:"$":0}}</p>
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="col-sm-2 control-label">BẢO HIỂM (VND)</label>
+    <div class="col-sm-10">
+      <p class="form-control-static">{{insurance | currency:"$":0}}</p>
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="col-sm-2 control-label">THUẾ THU NHẬP CÁ NHÂN (VND)</label>
+    <div class="col-sm-10">
+      <p class="form-control-static">{{personal_tax | currency:"$":0}}</p>
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="col-sm-2 control-label">PHÍ CÔNG ĐOÀN (VND)</label>
+    <div class="col-sm-10">
+      <p class="form-control-static">{{union_fee | currency:"$":0}}</p>
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="col-sm-2 control-label">THỰC LÃNH QUA VCB (VND)</label>
+    <div class="col-sm-10">
+      <h3>{{total_salary_after_tax | currency:"$":0}}</h3>
+    </div>
+  </div>
+</form>
+
+
+
+</div>
+
+<script>
+var app = angular.module('myApp', []);
+app.controller('myCtrl', function($scope) {
+    $scope.rank_list = [
+        {id: 'A', max: 549, min: 0},
+        {id: 'B', max: 624, min: 550},
+        {id: 'C', max: 750, min: 625},
+        {id: 'D', max: 1100, min: 751},
+        {id: 'E', max: 0, min: 1101}
+    ];
+    $scope.exchange_rate = 22325;
+    $scope.monthly_salary = 0;
+    $scope.bonus_salary = 0;
+    $scope.monthly_salary_vnd = 0;
+    $scope.bonus_salary_vnd = 0;
+    $scope.basic_salary = 0;
+    $scope.bonus = 0;
+    $scope.insurance = 0;
+    $scope.total_salary_after_tax = 0;
+    $scope.personal_tax = 0;
+    $scope.dependent = 0;
+    $scope.eating = 0;
+    $scope.phone = 0;
+    $scope.union_fee = 0;
+    $scope.eating_list = [
+        {id: 'A', value: 680000},
+        {id: 'B', value: 680000},
+        {id: 'C', value: 680000},
+        {id: 'D', value: 680000},
+        {id: 'E', value: 680000}
+    ];
+    $scope.phone_list = [
+        {id: 'A', value: 150000},
+        {id: 'B', value: 500000},
+        {id: 'C', value: 800000},
+        {id: 'D', value: 1000000},
+        {id: 'E', value: 1700000}
+    ];
+    $scope.home_list = [
+        {id: 'A', value: 100000},
+        {id: 'B', value: 500000},
+        {id: 'C', value: 800000},
+        {id: 'D', value: 1500000},
+        {id: 'E', value: 2500000}
+    ];
+    $scope.go = 200000;
+    $scope.deduction_rank_list = [
+        {id: '1', tax_rate: 0.05, max: 5000000, min: 0, deduct: 0},
+        {id: '2', tax_rate: 0.1, max: 10000000, min: 5000000, deduct: 250000},
+        {id: '3', tax_rate: 0.15, max: 18000000, min: 10000000, deduct: 750000},
+        {id: '4', tax_rate: 0.2, max: 32000000, min: 18000000, deduct: 1650000},
+        {id: '5', tax_rate: 0.25, max: 52000000, min: 32000000, deduct: 3250000},
+        {id: '6', tax_rate: 0.3, max: 80000000, min: 52000000, deduct: 5850000},
+        {id: '7', tax_rate: 0.35, max: 0, min: 80000000, deduct: 9850000}
+    ];
+    $scope.cal_tax = function(){
+
+        $scope.monthly_salary_vnd = parseInt($scope.monthly_salary) * parseInt($scope.exchange_rate);
+
+        $scope.bonus_salary_vnd = parseInt($scope.bonus_salary) * parseInt($scope.exchange_rate);
+        var total_salary_vnd = $scope.monthly_salary_vnd + $scope.bonus_salary_vnd + parseInt($scope.bonus); // (1)
+
+        var rank = 'A';
+        angular.forEach($scope.rank_list, function(rval, rkey) {
+            if ($scope.monthly_salary >= rval.min && ($scope.monthly_salary <= rval.max || rval.max == 0)) {
+                rank = rval.id;
+                return false;
+            }
+        });
+        angular.forEach($scope.eating_list, function(eval, ekey) {
+            if (eval.id == rank) {
+                $scope.eating = eval.value;
+                return false;
+            }
+        });
+        angular.forEach($scope.phone_list, function(pval, pkey) {
+            if (pval.id == rank) {
+                $scope.phone = pval.value;
+                return false;
+            }
+        });
+        var home_fee = 0;
+        angular.forEach($scope.home_list, function(hval, hkey) {
+            if (hval.id == rank) {
+                home_fee = hval.value;
+                return false;
+            }
+        });
+        $scope.basic_salary = $scope.monthly_salary_vnd - ($scope.eating + $scope.phone + home_fee + $scope.go);
+        $scope.insurance = ($scope.basic_salary * 0.08) + ($scope.basic_salary * 0.015) + ($scope.basic_salary * 0.01);
+        $scope.union_fee = $scope.basic_salary * 0.01;
+        if ($scope.union_fee > 121000) {
+            $scope.union_fee = 121000;
+        };
+        var allowance = $scope.eating + $scope.phone; // (2)
+        if ($scope.phone > 500000) {
+            allowance = (allowance - $scope.phone) + 500000;
+        }
+
+        var tax_deduction = ($scope.dependent * 3600000) + 9000000;
+
+        var income_taxes = total_salary_vnd - (allowance + $scope.insurance + tax_deduction); //(3)
+
+        angular.forEach($scope.deduction_rank_list, function(dval, dkey) {
+            if (income_taxes >= dval.min && (income_taxes < dval.max || dval.max == 0)) {
+                $scope.personal_tax = (dval.tax_rate * income_taxes) - dval.deduct;
+                return false;
+            };
+        });
+
+        $scope.total_salary_after_tax = total_salary_vnd - ($scope.personal_tax + $scope.insurance + $scope.union_fee + parseInt($scope.bonus));
+    };
+});
+</script>
+
+</body>
+</html>
